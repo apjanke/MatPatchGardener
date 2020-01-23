@@ -266,8 +266,9 @@ classdef Patch
         cmd = sprintf('LC_ALL=C diff -Nru "%s" . >> "%s"', ...
           tempDir, this.patchFile);
       else
-        mperror('Sorry, harvest is not yet supported on Windows');
-        return
+        % Just hope that there is a Unix-y diff installed
+        cmd = sprintf('diff -Nru "%s" . >> "%s"', ...
+          tempDir, this.patchFile);
       end
       [status,output] = system(cmd);
       if status ~= 0
