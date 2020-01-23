@@ -1,5 +1,5 @@
 function wakeup
-% Initialize the MatPatchGardener library
+% Get ready for gardening by initializing the MatPatchGardener library
 %
 % You have to wake up and get dressed before you do any gardening
 

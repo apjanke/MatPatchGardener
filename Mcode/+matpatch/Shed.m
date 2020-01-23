@@ -2,7 +2,7 @@ classdef Shed
   % The Shed contains all the tools for maintaining a patch garden
   
   methods (Static)
-  
+    
     function [out, details] = readdir(pth)
       if ~isfolder(pth)
         error('Path is not a folder: %s', pth);
@@ -29,9 +29,9 @@ classdef Shed
     function cpr(src, dest)
       % Recursive copy of files and dirs
       if isunix
-        [status,out] = system(['cp -R "' char(src) '" "' char(dest)]);
+        [status,out] = system(['cp -R "' char(src) '" "' char(dest) '"']);
       else
-        [status,out] = system(['xcopy "' char(src) '" "' char(dest) '\ /E/H']);
+        [status,out] = system(['xcopy "' char(src) '" "' char(dest) '\" /E/H']);
       end
       if status ~= 0
         error("Failed copying '%s' to '%s': %s", src, dest, out);
@@ -76,7 +76,7 @@ classdef Shed
       setappdata(0, 'matpatchgardener_state', s);
     end
     
-    function out = currentGarden(dir)
+    function out = activeGarden(dir)
       if nargin == 0
         currPath = matpatch.Shed.getappdata('garden_path');
         if isempty(currPath)
@@ -88,22 +88,31 @@ classdef Shed
         if ~isfolder(dir)
           logger.warn('Setting Garden to non-existent dir: %s', dir);
         end
-        oldVal = matpatch.Shed.currentGarden;
+        oldVal = matpatch.Shed.activeGarden;
         if ~isequal(dir, oldVal)
           matpatch.Shed.setappdata('garden_path', dir);
           % Clear the active patch when switching gardens; it won't be
           % applicable even if it has the same name.
-          matpatch.Shed.activePatch([]);
+          matpatch.Shed.activePatchName([]);
         end
       end
     end
     
-    function out = activePatch(name)
+    function out = activePatchName(name)
       if nargin == 0
         out = matpatch.Shed.getappdata('active_patch');
       else
         matpatch.Shed.setappdata('active_patch', name);
       end
+    end
+    
+    function out = activePatch()
+      garden = matpatch.Shed.activeGarden;
+      if isempty(garden)
+        out = [];
+        return
+      end
+      out = garden.getPatch(matpatch.Shed.activePatchName);
     end
     
     function out = configDir()
@@ -146,6 +155,23 @@ classdef Shed
       matpatch.Shed.spew(matpatch.Shed.userConfigFile, jsonencode(s));
       fprintf("\nWrote your gardener info to: %s\n", matpatch.Shed.userConfigFile);
       logger.debug("Wrote your gardener info to: %s", matpatch.Shed.userConfigFile);
+    end
+    
+    
+    function out = codeDirForMfile(mfilePath)
+      % For a given mfile, get the dir that should be on the path to expose it
+      %
+      % This accounts for +pkg namespace structure.
+      immedParent = fileparts(mfilePath);
+      els = strsplit(immedParent, filesep);
+      while els{end}(1) == '+' || els{end}(1) == '@' || isequal(els{end}, 'private')
+        els(end) = [];
+      end
+      out = strjoin(els, filesep);
+    end
+    
+    function out = findfiles(pattern, basedir)
+      out = findfiles(pattern, basedir);
     end
     
   end

@@ -21,3 +21,9 @@ As of this writing, that's Matlab R2019b.
 MatPatchGardner is written by [Andrew Janke](https://apjanke.net).
 
 The project home page is <https://www.mathworks.com/products/matlab.html>. Bug reports and feature requests can be filed there.
+
+### Acknowledgments
+
+Also contains code from other authors:
+
+Matt Tearle (2020). Recursively search for files (<https://www.mathworks.com/matlabcentral/fileexchange/57298-recursively-search-for-files>), MATLAB Central File Exchange. Retrieved January 23, 2020.

@@ -5,7 +5,7 @@ function lookaround
 
 fprintf('\n');
 
-garden = matpatch.Shed.currentGarden;
+garden = matpatch.Shed.activeGarden;
 
 if isempty(garden)
   fprintf('You are not in a garden!\n');
@@ -13,6 +13,6 @@ if isempty(garden)
 end
 
 fprintf('Active garden: %s\n', garden.dir);
-fprintf('Active patch: %s\n', matpatch.Shed.activePatch);
+fprintf('Active patch: %s\n', matpatch.Shed.activePatchName);
 fprintf('\n');
 

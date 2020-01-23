@@ -1,4 +1,4 @@
-function error(fmt, varargin)
+function mperror(fmt, varargin)
 % Note that an error has occurred, but don't raise an exception
 
 fprintf(['Error: ' char(fmt) '\n'], varargin{:});

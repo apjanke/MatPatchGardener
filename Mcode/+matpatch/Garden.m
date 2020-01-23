@@ -33,7 +33,7 @@ classdef Garden
         logger.warn("A patch with name '%s' already exists! Not creating.", name);
         return
       end
-      patch = matpatch.Patch(this, patchDir);
+      patch = matpatch.Patch(this, name, patchDir);
       patch.till;
       logger.info("Dug up new patch '%s' using Matlab %s", name, ...
         matpatch.Shed.matlabVersion);
@@ -42,7 +42,7 @@ classdef Garden
     
     function out = getPatch(this, name)
       patchDir = fullfile(this.patchesDir, name);
-      out = matpatch.Patch(this, patchDir);
+      out = matpatch.Patch(this, name, patchDir);
     end
     
     function [out,details] = listPatches(this)
