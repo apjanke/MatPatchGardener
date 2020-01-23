@@ -33,4 +33,4 @@ patchName = patchNames(ix);
 
 matpatch.Shed.activatePatch(patchName);
 
-logger.info("Walked over to patch %s", patchName);
+logger.info("Now gardening patch %s", patchName);

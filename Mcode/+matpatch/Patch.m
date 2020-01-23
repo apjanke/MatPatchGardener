@@ -232,7 +232,17 @@ classdef Patch
           info.MatlabVersion, matpatch.Shed.matlabVersion);
         return
       end
-      % TODO: Detect whether a Unix-y diff is installed on Windows
+      % Detect whether a Unix-y diff is installed on Windows
+      if ispc
+        [status, output] = system('diff --version');
+        if status ~= 0
+          logger.warn('Can''t find a diff command.');
+          logger.info('This is probably because you don''t have diffutils installed.');
+          logger.info('Try installing diffutils from http://gnuwin32.sourceforge.net/packages/diffutils.htm');
+          logger.info('And make sure to add them to your %%PATH%%.')
+          return
+        end
+      end
       
       % We can't diff directly against the Matlab installation, because we want
       % to ignore non-existent files only on one side. So create a staging
@@ -262,19 +272,11 @@ classdef Patch
         userInfo.Name, userInfo.Email, datestr(now), ...
         info.MatlabVersion, computer);
       matpatch.Shed.spew(this.patchFile, header);
-      if isunix
-        cmd = sprintf('LC_ALL=C diff -Nru "%s" . >> "%s"', ...
-          tempDir, this.patchFile);
-      else
-        % Just hope that there is a Unix-y diff installed
-        cmd = sprintf('diff -Nru "%s" . >> "%s"', ...
-          tempDir, this.patchFile);
-      end
-      [status,output] = system(cmd);
-      if status ~= 0
-        mperror('Running diff failed: %s', output);
-        return
-      end
+      cmd = sprintf('diff -Nru "%s" . >> "%s"', ...
+        tempDir, this.patchFile);
+      [~,~] = system(cmd);
+      % We're just ignoring the exit status because diff returns nonzero if
+      % the files differ, and we can't differentiate that from failure.
       
       matpatch.Shed.rmrf(tempDir);
       

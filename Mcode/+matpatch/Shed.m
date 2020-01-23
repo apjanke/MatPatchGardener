@@ -51,7 +51,7 @@ classdef Shed
     function rmrf(target)
       % Recursively, forcibly remove files
       if ispc
-        cmd = sprintf('del /S /F "%s"', target);
+        cmd = sprintf('del /S /F /Q "%s"', target);
       else
         cmd = sprintf('rm -rf "%s"', target);
       end
@@ -76,7 +76,7 @@ classdef Shed
       if fid < 1
         error("Failed opening file '%s' for writing: %s", file, msg);
       end
-      RAII.fid = @() fclose(fid); %#ok<STRNU>
+      RAII.fid = onCleanup(@() fclose(fid));
       fprintf(fid, '%s', txt);
     end
     

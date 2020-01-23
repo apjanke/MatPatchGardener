@@ -10,6 +10,14 @@ But do that at your own risk; it is an unsupported configuration.
 
 WARNING! Matlab is proprietary, commerical software. Its contents are the intellectual property of MathWorks. The patches you create are derived works of Matlab, and will also contain MathWorks' intellectual property. Do not give access to your patches to anyone unless you have verified that they have a currently active Matlab license!
 
+## Requirements
+
+On Windows, you need to install [GNU diffutils](http://gnuwin32.sourceforge.net/packages/diffutils.htm) or something else that gives you a Unix-y `diff` command.
+
+MatPatchGardener requires the latest release of Matlab.
+(There's not much point in producing patches for older releases.)
+As of this writing, that's Matlab R2019b.
+
 ## Quick Start
 
 ```matlab
@@ -49,12 +57,6 @@ You must call `matpatch.wakeup` to initialize the library every time you start a
 The easiest way to do this is to cd to the `Mcode/` directory under the MatPatchGardener installation and run it from there.
 
 If this is your first time gardening, `matpatch.wakeup` will walk you through an interactive setup of your user info.
-
-## Requirements
-
-MatPatchGardener requires the latest release of Matlab.
-(There's not much point in producing patches for older releases.)
-As of this writing, that's Matlab R2019b.
 
 ## Author
 
