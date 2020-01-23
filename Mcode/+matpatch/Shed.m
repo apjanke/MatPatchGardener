@@ -1,12 +1,16 @@
 classdef Shed
   % The Shed contains all the tools for maintaining a patch garden
   
-  properties (Constant)
-    % The default garden path to use for new users
-    DefaultDefaultGardenPath = "~/MatPatchGarden"
-  end
-  
   methods (Static)
+    
+    function out = defaultDefaultGardenPath()
+      % The default garden path to use for new users
+      if ispc
+        out = '~/Documents/MatPatchGarden';
+      else
+        out = '~/MatPatchGarden';
+      end
+    end
     
     function [out, details] = readdir(pth)
       % List the directory entries under a given dir
@@ -245,7 +249,7 @@ classdef Shed
       s.GitHubUser = input("Your GitHub username (optional): ", "s");
       % TODO: On Windows, default garden path should go under ~/Documents,
       % not just ~.
-      dfltGarden = matpatch.Shed.DefaultDefaultGardenPath;
+      dfltGarden = matpatch.Shed.defaultDefaultGardenPath;
       gardDir = input(sprintf("Default garden path [%s]: ", dfltGarden), "s");
       fprintf("\n");
       if isempty(gardDir)
