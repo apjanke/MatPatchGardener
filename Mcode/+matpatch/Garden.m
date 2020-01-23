@@ -16,9 +16,6 @@ classdef Garden
       if nargin == 0
         return
       end
-      if ~isfolder(dir)
-        error('Cannot find Garden: No such dir: %s', dir);
-      end
       this.dir = dir;
     end
     
@@ -68,6 +65,10 @@ classdef Garden
     function initializeOnDisk(this)
       matpatch.Shed.mkdir(this.dir);
       matpatch.Shed.mkdir(this.patchesDir);
+    end
+    
+    function out = isInitializedOnDisk(this)
+      out = isfolder(this.dir) && isfolder(this.patchesDir);
     end
     
   end

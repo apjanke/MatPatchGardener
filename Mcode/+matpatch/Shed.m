@@ -1,6 +1,10 @@
 classdef Shed
   % The Shed contains all the tools for maintaining a patch garden
   
+  properties (Constant)
+    DefaultDefaultGardenPath = "~/MatPatchGarden"
+  end
+  
   methods (Static)
     
     function [out, details] = readdir(pth)
@@ -113,6 +117,10 @@ classdef Shed
         end
         out = matpatch.Garden(currPath);
       else
+        if isstring(dir)
+          mustBeScalar(dir)
+          dir = char(dir);
+        end
         mustBeCharvec(dir);
         if ~isfolder(dir)
           logger.warn('Setting Garden to non-existent dir: %s', dir);
@@ -218,19 +226,23 @@ classdef Shed
       s.Name = input("Your name: ", "s");
       s.Email = input("Your email address: ", "s");
       s.GitHubUser = input("Your GitHub username (optional): ", "s");
-      gardDir = input("Default garden path (optional): ", "s");
+      dfltGarden = matpatch.Shed.DefaultDefaultGardenPath;
+      gardDir = input(sprintf("Default garden path [%s]: ", dfltGarden), "s");
       fprintf("\n");
-      if ~isempty(gardDir)
-        gardDir = regexprep(gardDir, '^~', matpatch.Shed.userHomeDir);
-        try
-          garden = matpatch.Garden(gardDir);
+      if isempty(gardDir)
+        gardDir = dfltGarden;
+      end
+      gardDir = regexprep(gardDir, '^~', matpatch.Shed.userHomeDir);
+      try
+        garden = matpatch.Garden(gardDir);
+        if ~garden.isInitializedOnDisk
           garden.initializeOnDisk;
           logger.info("Created your garden at %s.", gardDir);
-        catch err
-          logger.warn("Warning: Failed creating garden dir at %s: %s", gardDir, err.message);
         end
-        s.DefaultGarden = gardDir;
+      catch err
+        logger.warn("Warning: Failed creating garden dir at %s: %s", gardDir, err.message);
       end
+      s.DefaultGarden = gardDir;
       matpatch.Shed.userConfigInfo(s);
       fprintf("Wrote your gardener info to: %s\n", matpatch.Shed.userConfigFile);
       logger.debug("Wrote your gardener info to: %s", matpatch.Shed.userConfigFile);
