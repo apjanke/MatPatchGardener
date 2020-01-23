@@ -1,6 +1,8 @@
 classdef Patch
   % A Patch is a set of changes to Matlab, stored in a directory
   
+  % TODO: A function to list just the files that have diffs
+  
   properties (SetAccess = private)
     name
     % Parent garden
@@ -203,14 +205,10 @@ classdef Patch
       if ispc
         error('This is unsupported on Windows. Sorry')
       end
-      % TODO: Replace with a portable implementation
-      [status,txt] = system('find . -type f');
-      if status ~= 0
-        error('find failed: %s', txt);
-      end
-      txt(end) = [];
-      files = strsplit(txt, sprintf('\n')); %#ok<SPRINTFN>
-      files = regexprep(files, '^\./', '');
+      files = findfiles('*', '.');
+      files = regexprep(files, '^\.[/\\]', '');
+      tfDir = cellfun(@isfolder, files);
+      files(tfDir) = [];
       out = string(sort(files(:)));
     end
     
