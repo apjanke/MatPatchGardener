@@ -33,7 +33,7 @@ classdef Patch
       this.infoFile = fullfile(this.dir, 'info.json');
       this.patchFile = fullfile(this.dir, [char(this.name) '.patch']);
     end
-
+    
     function out = info(this)
       out = jsondecode(fileread(this.infoFile));
     end
@@ -84,58 +84,59 @@ classdef Patch
           if startsWith(w, matlabroot)
             % TODO: Check for @class dirs that we need to add
             relFiles(iThing) = w(numel(matlabroot)+2:end);
+          elseif startsWith(w, 'built-in (')
+            mperror("Cannot plant %s: it is a built-in", thing);
           else
             mperror("File for thing '%s' (%s) is not under matlabroot.", thing, w);
             return
           end
         end
-        
-        % See if we need to grab private directories, too
-        privDirs = string.empty; % as relative paths
-        classDirs = string.empty; % as relative paths
-        for f = relFiles
-          %source = fullfile(matlabroot, f);
-          parentDir = fileparts(f);
-          [~,parentDirBase] = fileparts(parentDir);
-          privDir = fullfile(parentDir, 'private');
-          if isfolder(privDir)
-            privDirs(end+1) = privDir; %#ok<AGROW>
-          end
-          if parentDirBase(1) == '@'
-            classDirs(end+1) = parentDir; %#ok<AGROW>
-          end
+      end
+      tfMiss = ismissing(relFiles);
+      relFiles(tfMiss) = [];
+      things(tfMiss) = [];
+      
+      % See if we need to grab private directories, too
+      privDirs = string.empty; % as relative paths
+      classDirs = string.empty; % as relative paths
+      for f = relFiles
+        parentDir = fileparts(f);
+        [~,parentDirBase] = fileparts(parentDir);
+        privDir = fullfile(parentDir, 'private');
+        if isfolder(privDir)
+          privDirs(end+1) = privDir; %#ok<AGROW>
         end
-        privDirs = unique(privDir);
-        if ~isempty(classDirs)
-          error('Uh oh! I don''t know how to handle @class dirs yet!');
+        if parentDirBase(1) == '@'
+          classDirs(end+1) = parentDir; %#ok<AGROW>
         end
-        
-        % Okay, all things resolved to files
-        % TODO: Handle things that already exist:
-        %   * Ignore if contents are exactly the same
-        %   * Warn and skip if contents in patch are different (local mods)
-        for i = 1:numel(relFiles)
-          f = relFiles(i);
-          source = fullfile(matlabroot, f);
-          dest = fullfile(this.filesDir, f);
-          matpatch.Shed.mkdir(fileparts(dest));
-          if isfile(dest)
-            logger.info("File %s is already planted in patch", things(i));
-          else
-            copyfile(source, dest);
-            logger.info("Planted %s at %s", things(i), f);
-          end
+      end
+      privDirs = unique(privDirs);
+      if ~isempty(classDirs)
+        error('Uh oh! I don''t know how to handle @class dirs yet!');
+      end
+      
+      % Okay, all things resolved to files
+      for i = 1:numel(relFiles)
+        f = relFiles(i);
+        source = fullfile(matlabroot, f);
+        dest = fullfile(this.filesDir, f);
+        matpatch.Shed.mkdir(fileparts(dest));
+        if isfile(dest)
+          logger.info("File %s is already planted in patch", things(i));
+        else
+          copyfile(source, dest);
+          logger.info("Planted %s at %s", things(i), f);
         end
-        if ~isempty(privDirs)
-          logger.info("Grabbing %d private/ dirs, too:", numel(privDirs));
-        end
-        for i = 1:numel(privDirs)
-          relDir = privDirs(i);
-          absPrivDir = fullfile(matlabroot, relDir);
-          dest = fullfile(this.filesDir, relDir);
-          matpatch.Shed.cpr(absPrivDir, dest);
-          logger.info("Planted %s at %s", relDir, dest);
-        end
+      end
+      if ~isempty(privDirs)
+        logger.info("Grabbing %d private/ dirs, too:", numel(privDirs));
+      end
+      for i = 1:numel(privDirs)
+        relDir = privDirs(i);
+        absPrivDir = fullfile(matlabroot, relDir);
+        dest = fullfile(this.filesDir, relDir);
+        matpatch.Shed.cpr(absPrivDir, dest);
+        logger.info("Planted %s at %s", relDir, dest);
       end
       
       % And now that we have new files, need to make sure that our paths are up
