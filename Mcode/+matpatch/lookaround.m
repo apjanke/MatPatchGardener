@@ -9,6 +9,7 @@ garden = matpatch.Shed.activeGarden;
 
 if isempty(garden)
   fprintf('You are not in a garden!\n');
+  fprintf('\n');
   return
 end
 

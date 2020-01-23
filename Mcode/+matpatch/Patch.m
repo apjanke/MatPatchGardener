@@ -38,7 +38,7 @@ classdef Patch
       out = jsondecode(fileread(this.infoFile));
     end
     
-    function till(this)
+    function dig(this)
       % Initialize the patch directory
       if isfolder(this.dir)
         error('Cannot initialize patch dir: dir already exists: %s', this.dir);
@@ -250,7 +250,7 @@ classdef Patch
         ''
         ''
         }, '\n'), ...
-        userInfo.name, userInfo.email, datestr(now), ...
+        userInfo.Name, userInfo.Email, datestr(now), ...
         info.MatlabVersion, computer);
       matpatch.Shed.spew(this.patchFile, header);
       cmd = sprintf('LC_ALL=C diff -Nru "%s" . >> "%s"', ...
@@ -262,6 +262,7 @@ classdef Patch
       fprintf("\n");
       logger.info("Harvested patch %s.", this.name);
       logger.info("Created patch file at: %s", this.patchFile);
+      fprintf("\n");
     end
   end
   

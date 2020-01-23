@@ -89,11 +89,27 @@ classdef Shed
       setappdata(0, 'matpatchgardener_state', s);
     end
     
+    function setDefaultGarden(dir)
+      % Persistently set the default garden that you get when you wakeup
+      %
+      % matpatch.Shed.setDefaultGarden(pathToGardenDir)
+      s = matpatch.Shed.userConfigInfo;
+      s.DefaultGarden = dir;
+      matpatch.Shed.userConfigInfo(s);
+    end
+    
     function out = activeGarden(dir)
+      % Get or set the active garden
+      %
+      % out = matpatch.Shed.activeGarden
+      % matpatch.Shed.activeGarden(pathToGardenDir)
+      %
+      % Returns a matpatch.Garden object or [].
       if nargin == 0
         currPath = matpatch.Shed.getappdata('garden_path');
         if isempty(currPath)
-          error('No current garden is set!');
+          out = [];
+          return;
         end
         out = matpatch.Garden(currPath);
       else
@@ -128,6 +144,20 @@ classdef Shed
       out = garden.getPatch(matpatch.Shed.activePatchName);
     end
     
+    function activatePatch(this, name)
+      newPatch = this.getPatch(name);
+      if isempty(newPatch)
+        mperror("No such patch: %s", name);
+        return;
+      end
+      oldPatch = matpatch.Shed.activePatch;
+      if ~isempty(oldPatch)
+        oldPatch.deactivate;
+      end
+      newPatch.activate;
+      matpatch.Shed.activePatchName(name);
+    end
+    
     function out = configDir()
       if ispc
         configDir = getenv('APPDATA');
@@ -145,13 +175,27 @@ classdef Shed
       out = fullfile(matpatch.Shed.configDir, 'gardener.json');
     end
     
-    function out = userConfigInfo()
-      file = matpatch.Shed.userConfigFile;
-      if ~isfile(file)
-        out = [];
-        return
+    function out = userConfigInfo(newInfo)
+      % Get or set the persistent user config info
+      %
+      % out = matpatch.Shed.userConfigInfo()
+      % matpatch.Shed.userConfigInfo(newInfo)
+      %
+      % The setter form completely overwrites the user config info, so make sure
+      % you read it first and then incrementally add new entries to it!
+      configFile = matpatch.Shed.userConfigFile;
+      if nargin == 0
+        if ~isfile(configFile)
+          out = struct;
+          return
+        end
+        out = jsondecode(fileread(configFile));
+      else
+        if ~isstruct(newInfo)
+          error('User config info must be a struct; got a %s', class(newInfo));
+        end
+        matpatch.Shed.spew(configFile, jsonencode(newInfo));
       end
-      out = jsondecode(fileread(file));
     end
     
     function interactiveSetup
@@ -162,14 +206,37 @@ classdef Shed
       % This initializes the user config file in your config directory.
       
       % TODO: Use old values as defaults if run while a config file exists
-      s.name = input("Your name: ", "s");
-      s.email = input("Your email address: ", "s");
-      s.ghuser = input("Your GitHub username (optional): ", "s");
-      matpatch.Shed.spew(matpatch.Shed.userConfigFile, jsonencode(s));
-      fprintf("\nWrote your gardener info to: %s\n", matpatch.Shed.userConfigFile);
+      s.Name = input("Your name: ", "s");
+      s.Email = input("Your email address: ", "s");
+      s.GitHubUser = input("Your GitHub username (optional): ", "s");
+      gardDir = input("Default garden path (optional): ", "s");
+      fprintf("\n");
+      if ~isempty(gardDir)
+        gardDir = regexprep(gardDir, '^~', matpatch.Shed.userHomeDir);
+        try
+          garden = matpatch.Garden(gardDir);
+          garden.initializeOnDisk;
+          logger.info("Created your garden at %s.", gardDir);
+        catch err
+          logger.warn("Warning: Failed creating garden dir at %s: %s", gardDir, err.message);
+        end
+        s.DefaultGarden = gardDir;
+      end
+      matpatch.Shed.userConfigInfo(s);
+      fprintf("Wrote your gardener info to: %s\n", matpatch.Shed.userConfigFile);
       logger.debug("Wrote your gardener info to: %s", matpatch.Shed.userConfigFile);
+      if ~isempty(gardDir)
+        matpatch.Shed.activeGarden(gardDir);
+      end
     end
     
+    function out = userHomeDir
+      if ispc
+        out = getenv('USERPROFILE');
+      else
+        out = getenv('HOME');
+      end
+    end
     
     function out = codeDirForMfile(mfilePath)
       % For a given mfile, get the dir that should be on the path to expose it

@@ -6,9 +6,9 @@ function activate(patchNameOrPrefix)
 
 targ = patchNameOrPrefix;
 garden = matpatch.Shed.activeGarden;
-patches = garden.listPatches;
+patchNames = garden.listPatches;
 
-ix = find(startsWith(lower(patches), lower(targ)));
+ix = find(startsWith(lower(patchNames), lower(targ)));
 if isempty(ix)
   mperror("No matching patch for '%s' in your garden at '%s'", ...
     targ, garden.dir);
@@ -16,10 +16,10 @@ if isempty(ix)
 end
 if numel(ix) > 1
   mperror("Multiple patches in your garden matched '%s': %s", ...
-    targ, strjoin(patches(ix), ", "));
+    targ, strjoin(patchNames(ix), ", "));
 end
+patchName = patchNames(ix);
 
-patch = patches(ix);
-patch.activate;
+matpatch.Shed.activatePatch(patchName);
 
 log.info("Walked over to patch %s", patch);

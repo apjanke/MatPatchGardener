@@ -34,7 +34,7 @@ classdef Garden
         return
       end
       patch = matpatch.Patch(this, name, patchDir);
-      patch.till;
+      patch.dig;
       logger.info("Dug up new patch '%s' using Matlab %s", name, ...
         matpatch.Shed.matlabVersion);
       out = patch;
@@ -60,6 +60,11 @@ classdef Garden
         disp(details)
         clear out
       end
+    end
+    
+    function initializeOnDisk(this)
+      matpatch.Shed.mkdir(this.dir);
+      matpatch.Shed.mkdir(this.patchesDir);
     end
     
   end
