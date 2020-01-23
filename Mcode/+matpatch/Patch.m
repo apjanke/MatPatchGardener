@@ -184,7 +184,7 @@ classdef Patch
         return
       end
       origWarn = warning;
-      RAII.warning = @() warning(origWarn); %#ok<STRNU>
+      RAII.warning = onCleanup(@() warning(origWarn));
       warning off matlab:TODO:FIND:THIS:WARNING:ID:FOR:SHADOWING:FUNCTIONS
       addpath(toAdd{:}, '-begin');
       logger.debug('Added to Matlab path:\n%s', strjoin(toAdd, '\n'));
@@ -200,7 +200,7 @@ classdef Patch
     
     function out = allFiles(this)
       origCd = pwd;
-      RAII.cd = @() cd(origCd); %#ok<STRNU>
+      RAII.cd = onCleanup(@() cd(origCd));
       cd(this.filesDir);
       if ispc
         error('This is unsupported on Windows. Sorry')
@@ -238,7 +238,7 @@ classdef Patch
       end
       
       origcd = pwd;
-      RAII.origcd = @() cd(origcd); %#ok<STRNU>
+      RAII.origcd = onCleanup(@() cd(origcd));
       cd(this.filesDir);
       header = sprintf(strjoin({
         'Patch created by %s <%s> at %s'
