@@ -243,13 +243,17 @@ classdef Shed
       s.Name = input("Your name: ", "s");
       s.Email = input("Your email address: ", "s");
       s.GitHubUser = input("Your GitHub username (optional): ", "s");
+      % TODO: On Windows, default garden path should go under ~/Documents,
+      % not just ~.
       dfltGarden = matpatch.Shed.DefaultDefaultGardenPath;
       gardDir = input(sprintf("Default garden path [%s]: ", dfltGarden), "s");
       fprintf("\n");
       if isempty(gardDir)
-        gardDir = dfltGarden;
+        gardDir = char(dfltGarden);
       end
-      gardDir = regexprep(gardDir, '^~', matpatch.Shed.userHomeDir);
+      if gardDir(1) == '~'
+        gardDir = fullfile(matpatch.Shed.userHomeDir, gardDir(2:end));
+      end
       try
         garden = matpatch.Garden(gardDir);
         if ~garden.isInitializedOnDisk
