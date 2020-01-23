@@ -145,6 +145,11 @@ classdef Patch
         logger.info("Planted %s at %s", relDir, dest);
       end
       
+      % Make them writable
+      if isunix
+        [~,~] = system(sprintf('chmod -R u+w "%s"', this.filesDir));
+      end
+      
       % And now that we have new files, need to make sure that our paths are up
       % to date
       if this.isActive
