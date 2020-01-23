@@ -24,14 +24,23 @@ matpatch.Shed.activateGarden('/path/to/my/garden/dir');
 
 % Let's work on datetime stuff
 
-matpatch.dig('some-datetime-work')
-mp_plant datetime duration
-edit datetime
+matpatch.dig('some-graphics-work')
+mp_plant scatter scatter3
+edit scatter3
 
 % And then when you've made some changes to your local datetime copy:
 
 matpatch.harvest
 
+% Okay, let's work on something else
+
+matpatch.dig('my-stats-stuff')
+mp_plant mean
+
+% What have we got going on now?
+
+matpatch.lookaround
+matpatch.listpatches
 ```
 
 ## Usage
