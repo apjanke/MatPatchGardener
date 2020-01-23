@@ -7,12 +7,14 @@ classdef Garden
   end
   
   properties (Dependent)
+    % The patches directory under this garden
     patchesDir
   end
   
   methods
     
     function this = Garden(dir)
+      % Construct a new object
       if nargin == 0
         return
       end
@@ -24,6 +26,7 @@ classdef Garden
     end
     
     function out = newPatch(this, name)
+      % Create a new patch in this garden
       out = [];
       patchDir = fullfile(this.patchesDir, name);
       if isfolder(patchDir)
@@ -38,11 +41,13 @@ classdef Garden
     end
     
     function out = getPatch(this, name)
+      % Get an existing patch in this garden
       patchDir = fullfile(this.patchesDir, name);
       out = matpatch.Patch(this, name, patchDir);
     end
     
     function [out,details] = listPatches(this)
+      % List all the patches in this garden
       names = matpatch.Shed.readdir(this.patchesDir);
       % TODO: Add bogus Windows files
       % TODO: Ignore all files starting with dot
@@ -63,11 +68,13 @@ classdef Garden
     end
     
     function initializeOnDisk(this)
+      % Initialize the directory structure for this garden
       matpatch.Shed.mkdir(this.dir);
       matpatch.Shed.mkdir(this.patchesDir);
     end
     
     function out = isInitializedOnDisk(this)
+      % Whether the directory structure for this garden is initialized
       out = isfolder(this.dir) && isfolder(this.patchesDir);
     end
     

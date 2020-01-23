@@ -1,7 +1,11 @@
 function wakeup
 % Get ready for gardening by initializing the MatPatchGardener library
 %
-% You have to wake up and get dressed before you do any gardening
+% You have to wake up and get dressed before you do any gardening.
+%
+% This loads the MatPatchGardener library, and if you're using MatPatchGardener
+% for the first time, will run an interactive setup utility to configure your
+% user information.
 
 repoDir = fileparts(fileparts(fileparts(mfilename('fullpath'))));
 libDir = fullfile(repoDir, 'lib');

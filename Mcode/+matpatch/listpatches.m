@@ -1,5 +1,13 @@
 function out = listpatches
 % List the patches in the active garden
+%
+% matpatch.listpatches
+% patchNames = matpatch.listpatches
+%
+% Lists the patches in the active garden. If output is captured, returns a list
+% of their names. If output is not captured, displays a listing to the console.
+
+out = [];
 
 garden = matpatch.Shed.activeGarden;
 if isempty(garden)
@@ -14,4 +22,8 @@ if isempty(patches)
   return
 end
 
-disp(details);
+if nargout == 0
+  disp(details);
+  clear out
+end
+

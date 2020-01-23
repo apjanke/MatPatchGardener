@@ -4,13 +4,17 @@ classdef Patch
   % TODO: A function to list just the files that have diffs
   
   properties (SetAccess = private)
+    % Name of this patch
     name
     % Parent garden
     garden
-    % Path to the patch dir
+    % Path to the patch directory
     dir
+    % Files root directory under this patch
     filesDir
+    % The info file for this patch
     infoFile
+    % Where the harvested patch file goes
     patchFile
   end
   
@@ -36,11 +40,12 @@ classdef Patch
     end
     
     function out = info(this)
+      % Get the info in this patch's info file
       out = jsondecode(fileread(this.infoFile));
     end
     
     function dig(this)
-      % Initialize the patch directory
+      % Initialize the patch directory on disk
       if isfolder(this.dir)
         error('Cannot initialize patch dir: dir already exists: %s', this.dir);
       end
@@ -148,17 +153,24 @@ classdef Patch
     end
     
     function out = isActive(this)
+      % Whether this patch is the active patch in this process
       out = isequal(this.name, matpatch.Shed.activePatchName);
     end
     
     function activate(this)
       % ACTIVATE Activate this patch
+      %
+      % Calling this makes this the active patch, and adds all its M-code source
+      % directories to the Matlab path.
       matpatch.Shed.activePatchName(this.name);
       this.addToPath;
     end
     
     function deactivate(this)
       % DEACTIVATE Deactivate this patch
+      %
+      % Calling this unsets the active patch, and removes all of this' M-code
+      % source directories from the Matlab path.
       this.removeFromPath;
       matpatch.Shed.activePatchName([]);
     end
@@ -176,7 +188,7 @@ classdef Patch
     end
     
     function addToPath(this)
-      % Makes sure all this' needed dirs are on the matlab path
+      % Makes sure all this' needed dirs are on the Matlab path
       myCodeDirs = this.pathsForCode;
       currPath = strsplit(path, pathsep);
       toAdd = cellstr(setdiff(myCodeDirs, currPath));
@@ -191,6 +203,7 @@ classdef Patch
     end
     
     function removeFromPath(this)
+      % Makes sure all this' needed dirs are removed from the Matlab path
       myCodeDirs = this.pathsForCode;
       currPath = strsplit(path, pathsep);
       toRemove = cellstr(intersect(myCodeDirs, currPath));
@@ -199,6 +212,7 @@ classdef Patch
     end
     
     function out = allFiles(this)
+      % List all code files inside this patch
       origCd = pwd;
       RAII.cd = onCleanup(@() cd(origCd));
       cd(this.filesDir);
@@ -213,6 +227,7 @@ classdef Patch
     end
     
     function harvest(this)
+      % Create a patch file from the changes in this' local code files
       info = this.info;
       userInfo = matpatch.Shed.userConfigInfo;
       if ~isequal(matpatch.Shed.matlabVersion, info.MatlabVersion)

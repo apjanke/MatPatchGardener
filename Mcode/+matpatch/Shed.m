@@ -2,12 +2,18 @@ classdef Shed
   % The Shed contains all the tools for maintaining a patch garden
   
   properties (Constant)
+    % The default garden path to use for new users
     DefaultDefaultGardenPath = "~/MatPatchGarden"
   end
   
   methods (Static)
     
     function [out, details] = readdir(pth)
+      % List the directory entries under a given dir
+      %
+      % Does not include . and .. in the output.
+      %
+      % Returns a string vector.
       if ~isfolder(pth)
         error('Path is not a folder: %s', pth);
       end
@@ -75,6 +81,7 @@ classdef Shed
     end
     
     function out = getappdata(name)
+      % Gets a MatPatchGardener appdata value
       s = getappdata(0, 'matpatchgardener_state');
       if isempty(s) || ~isfield(s, name)
         % TODO: Should non-found name in existing struct be an error?
@@ -85,6 +92,7 @@ classdef Shed
     end
     
     function setappdata(name, val)
+      % Sets a MatPatchGardener appdata value
       s = getappdata(0, 'matpatchgardener_state');
       if isempty(s)
         s = struct;
@@ -103,7 +111,7 @@ classdef Shed
     end
     
     function out = activeGarden(dir)
-      % Get or set the active garden
+      % Get or set the active garden for this process
       %
       % out = matpatch.Shed.activeGarden
       % matpatch.Shed.activeGarden(pathToGardenDir)
@@ -136,6 +144,9 @@ classdef Shed
     end
     
     function out = activePatchName(name)
+      % Name of the current active patch
+      %
+      % Returns a string or charvec, or [] if there is no active patch.
       if nargin == 0
         out = matpatch.Shed.getappdata('active_patch');
       else
@@ -144,6 +155,9 @@ classdef Shed
     end
     
     function out = activePatch()
+      % Get the active patch in the active garden
+      %
+      % Returns a Patch object, or [] if there is no active patch.
       garden = matpatch.Shed.activeGarden;
       if isempty(garden)
         out = [];
@@ -157,6 +171,7 @@ classdef Shed
     end
     
     function activatePatch(name)
+      % Activate the named patch in the current active garden
       garden = matpatch.Shed.activeGarden;
       if isempty(garden)
         mperror("No active garden.");
@@ -176,6 +191,7 @@ classdef Shed
     end
     
     function out = configDir()
+      % Path to the user's MatPatchGardener config directory
       if ispc
         configDir = getenv('APPDATA');
       else
@@ -189,6 +205,7 @@ classdef Shed
     end
     
     function out = userConfigFile()
+      % Path to the user's MatPatchGardener config file
       out = fullfile(matpatch.Shed.configDir, 'gardener.json');
     end
     
@@ -252,6 +269,7 @@ classdef Shed
     end
     
     function out = userHomeDir
+      % The user's home dir, as defined by this OS's conventions
       if ispc
         out = getenv('USERPROFILE');
       else
@@ -272,6 +290,7 @@ classdef Shed
     end
     
     function out = findfiles(pattern, basedir)
+      % Recursively find files matching a pattern
       out = findfiles(pattern, basedir);
     end
     
