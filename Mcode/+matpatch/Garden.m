@@ -54,8 +54,12 @@ classdef Garden
         info = p.info;
         vers(i) = info.MatlabVersion;
       end
-      details = table(names, vers, 'VariableNames', {'Name','MatlabVer'});
+      details = table(names, vers, 'VariableNames', {'Name','MatlabVersion'});
       out = names';
+      if nargout == 0
+        disp(details)
+        clear out
+      end
     end
     
   end

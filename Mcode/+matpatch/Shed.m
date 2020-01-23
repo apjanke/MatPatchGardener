@@ -38,6 +38,19 @@ classdef Shed
       end
     end
     
+    function rmrf(target)
+      % Recursively, forcibly remove files
+      if ispc
+        cmd = sprintf('del /S /F "%s"', target);
+      else
+        cmd = sprintf('rm -rf "%s"', target);
+      end
+      [status, output] = system(cmd);
+      if status ~= 0
+        logger.warn("Failed deleting %s: %s", target, output);
+      end
+    end
+    
     function [release, details] = matlabVersion()
       % The Matlab version for this Matlab session
       v = ver('MATLAB');
