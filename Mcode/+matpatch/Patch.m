@@ -12,7 +12,6 @@ classdef Patch
     patchFile
   end
   
-  
   methods
     
     function this = Patch(garden, name, dir)
@@ -186,7 +185,7 @@ classdef Patch
       RAII.warning = @() warning(origWarn); %#ok<STRNU>
       warning off matlab:TODO:FIND:THIS:WARNING:ID:FOR:SHADOWING:FUNCTIONS
       addpath(toAdd{:}, '-begin');
-      logger.info('Added to Matlab path:\n%s', strjoin(toAdd, '\n'));
+      logger.debug('Added to Matlab path:\n%s', strjoin(toAdd, '\n'));
     end
     
     function removeFromPath(this)
@@ -194,7 +193,7 @@ classdef Patch
       currPath = strsplit(path, pathsep);
       toRemove = cellstr(intersect(myCodeDirs, currPath));
       rmpath(toRemove{:});
-      logger.info('Removed from Matlab path:\n%s', strjoin(toRemove, '\n'));
+      logger.debug('Removed from Matlab path:\n%s', strjoin(toRemove, '\n'));
     end
     
     function out = allFiles(this)

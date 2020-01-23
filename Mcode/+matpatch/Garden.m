@@ -47,6 +47,9 @@ classdef Garden
     
     function [out,details] = listPatches(this)
       names = matpatch.Shed.readdir(this.patchesDir);
+      % TODO: Add bogus Windows files
+      % TODO: Ignore all files starting with dot
+      names = setdiff(names, {'.DS_Store'});
       names = names(:);
       vers = repmat(string(missing), size(names));
       for i = 1:numel(names)

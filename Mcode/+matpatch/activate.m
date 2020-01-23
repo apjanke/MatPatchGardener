@@ -22,4 +22,4 @@ patchName = patchNames(ix);
 
 matpatch.Shed.activatePatch(patchName);
 
-log.info("Walked over to patch %s", patch);
+logger.info("Walked over to patch %s", patchName);

@@ -141,11 +141,20 @@ classdef Shed
         out = [];
         return
       end
+      if isempty(matpatch.Shed.activePatchName)
+        out = [];
+        return
+      end
       out = garden.getPatch(matpatch.Shed.activePatchName);
     end
     
-    function activatePatch(this, name)
-      newPatch = this.getPatch(name);
+    function activatePatch(name)
+      garden = matpatch.Shed.activeGarden;
+      if isempty(garden)
+        mperror("No active garden.");
+        return;
+      end
+      newPatch = garden.getPatch(name);
       if isempty(newPatch)
         mperror("No such patch: %s", name);
         return;

@@ -22,6 +22,11 @@ if isempty(fieldnames(matpatch.Shed.userConfigInfo))
   matpatch.Shed.interactiveSetup;
 end
 
+userInfo = matpatch.Shed.userConfigInfo;
+if isfield(userInfo, 'DefaultGarden')
+  matpatch.Shed.activeGarden(userInfo.DefaultGarden);
+end
+
 fprintf("\n");
 logger.info('You''re ready to garden!');
 fprintf("\n");

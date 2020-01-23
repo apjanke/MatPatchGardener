@@ -14,6 +14,11 @@ if isempty(garden)
 end
 
 fprintf('Active garden: %s\n', garden.dir);
-fprintf('Active patch: %s\n', matpatch.Shed.activePatchName);
-fprintf('\n');
+pname = matpatch.Shed.activePatchName;
+if isempty(pname)
+  fprintf('No active patch.\n');
+else
+  fprintf('Active patch: %s\n', pname);
+end
 
+fprintf('\n');
