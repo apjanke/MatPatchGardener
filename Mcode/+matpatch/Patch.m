@@ -216,9 +216,6 @@ classdef Patch
       origCd = pwd;
       RAII.cd = onCleanup(@() cd(origCd));
       cd(this.filesDir);
-      if ispc
-        error('This is unsupported on Windows. Sorry')
-      end
       files = findfiles('*', '.');
       files = regexprep(files, '^\.[/\\]', '');
       tfDir = cellfun(@isfolder, files);
@@ -265,9 +262,18 @@ classdef Patch
         userInfo.Name, userInfo.Email, datestr(now), ...
         info.MatlabVersion, computer);
       matpatch.Shed.spew(this.patchFile, header);
-      cmd = sprintf('LC_ALL=C diff -Nru "%s" . >> "%s"', ...
-        tempDir, this.patchFile);
-      system(cmd);
+      if isunix
+        cmd = sprintf('LC_ALL=C diff -Nru "%s" . >> "%s"', ...
+          tempDir, this.patchFile);
+      else
+        mperror('Sorry, harvest is not yet supported on Windows');
+        return
+      end
+      [status,output] = system(cmd);
+      if status ~= 0
+        mperror('Running diff failed: %s', output);
+        return
+      end
       
       matpatch.Shed.rmrf(tempDir);
       
