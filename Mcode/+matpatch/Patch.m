@@ -212,7 +212,9 @@ classdef Patch
       myCodeDirs = this.pathsForCode;
       currPath = strsplit(path, pathsep);
       toRemove = cellstr(intersect(myCodeDirs, currPath));
-      rmpath(toRemove{:});
+      if ~isempty(toRemove)
+        rmpath(toRemove{:});
+      end
       logger.debug('Removed from Matlab path:\n%s', strjoin(toRemove, '\n'));
     end
     
