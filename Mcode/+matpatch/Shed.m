@@ -232,7 +232,9 @@ classdef Shed
         if ~isstruct(newInfo)
           error('User config info must be a struct; got a %s', class(newInfo));
         end
-        matpatch.Shed.spew(configFile, jsonencode(newInfo));
+        uglyJson = jsonencode(newInfo);
+        prettyJson = matpatch.internal.prettyprintJson(uglyJson);
+        matpatch.Shed.spew(configFile, prettyJson);
       end
     end
     
